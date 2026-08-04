@@ -7,7 +7,7 @@
 
 <li><strong>Output file format</strong>:</li>
 The edge list of the compressed graph is saved to the text file named 'EL_var_δ_dataset_name.txt' where the first line contains the number of nodes(V) and the number of edges(E) separated by a tab, and the next E lines represent the undirected edges, which is denoted by two integers separated by a tab.<br>
-The supernode mapping of the compressed graph is saved to the text file named 'SL_var_δ_dataset_name.txt' where each line contains the supernode and its two subnodes separated by a tab.<br>The files are saved at <em>Compressed</em> folder.
+The supernode mapping of the compressed graph is saved to the text file named 'SN_var_δ_dataset_name.txt' where each line contains the supernode and its two subnodes separated by a tab.<br>The files are saved at <em>Compressed</em> folder.
 
 <li><strong>Running the algorithm:</strong>
 
