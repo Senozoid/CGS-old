@@ -1,3 +1,6 @@
+### About issues on this fork
+Only collaborators are allowed to open new issues on this fork. For anything regarding the original code, please visit the original repo. For this fork, please use the Discussions tab.
+
 # CGS - Configurable Graph Summarization with Bounded Neighborhood Loss and Query Support
 ## Running CGS
 <ol>
