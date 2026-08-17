@@ -899,6 +899,7 @@ void OutputController::compression() {
   float cf = (G.size - G_.size()) / (1.0 * G.size);
   float cr = 1.0 - cf;
   float degree = G.m / (1.0 * G.n);
+  cout<<"\nInput graph is complement: "<< (G_.is_complement ? "True" : "False");
   cout<<"\nNodes in input graph (G): "<<G.n;
   cout<<"\nEdges in input graph (G): "<<G.m;
   cout<<"\nNodes in compressed graph (G_c): "<<G_.n_;
@@ -916,7 +917,7 @@ void OutputController::compression_times() {
 }
 
 void OutputController::save_compressed_graph() {
-    cout<< G_.n_ << "\t" << G_.m<< "\t" << G_.n <<"\n";
+    cout<< G_.n_ << "\t" << G_.m<< "\t" << G_.n << "\t" << G_.is_complement << "\n";
     REP(i, G_.n_) {
       REP(j, G_.adj[i].size()) {
         int node_a = i;
