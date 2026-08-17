@@ -190,7 +190,7 @@ void CompressedGraph::input(char* EL_filename, char* SN_filename) {
   streambuf *cinbuf_1 = std::cin.rdbuf(); //save old buf
   cin.rdbuf(in_1.rdbuf()); //redirect std::cin to in.txt!
 
-  cin >> n_ >> m >> n;
+  cin >> n_ >> m >> n >> is_complement;
   adj.assign(n_, vi ());
 
   int a, b;
@@ -209,8 +209,6 @@ void CompressedGraph::input(char* EL_filename, char* SN_filename) {
   ifstream in_2(SN_filename);
   streambuf *cinbuf_2 = std::cin.rdbuf(); //save old buf
   cin.rdbuf(in_2.rdbuf()); //redirect std::cin to in.txt!
-
-  is_complement = false;
 
   int x, y, z;
   REPN(i, n, n_) {
