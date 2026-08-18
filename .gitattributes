@@ -1,5 +1,10 @@
 .gitattributes text eol=lf
+.gitignore eol=lf
+
 *.sh text eol=lf
 *.cpp text eol=lf
 *.txt text eol=lf
+*.md eol=lf
+*.json eol=lf
+
 *.cmd text eol=crlf
