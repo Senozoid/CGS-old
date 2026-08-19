@@ -899,9 +899,9 @@ void OutputController::compression() {
   float cf = (G.size - G_.size()) / (1.0 * G.size);
   float cr = 1.0 - cf;
   float degree = G.m / (1.0 * G.n);
-  cout<<"\nInput graph is complement: "<< (G_.is_complement ? "True" : "False");
   cout<<"\nNodes in input graph (G): "<<G.n;
   cout<<"\nEdges in input graph (G): "<<G.m;
+  cout<<"\nCompressed complement instead of input: "<< (G_.is_complement ? "True" : "False");
   cout<<"\nNodes in compressed graph (G_c): "<<G_.n_;
   cout<<"\nEdges in compressed graph (G_c): "<<G_.m;
   cout<<"\nSize of original graph (G): "<<G.size;
