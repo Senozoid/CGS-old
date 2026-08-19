@@ -416,7 +416,7 @@ CommonHood::CommonHood(Graph target, int type, vf thres) {
 
   G.input(target), fp = type, det = thres;
   // checking the complement graph
-  if( 1ll * m <= (1ll * n * (n-1)) / 4 ) G.input(target), fp = type, det = thres;
+  if( n <= 20 || 1ll * m <= (1ll * n * (n-1)) / 4 ) G.input(target), fp = type, det = thres;//make complement of bigger dense graphs only
   else {
     G.complement(target), fp = -type;
     det.assign(n, 0);
