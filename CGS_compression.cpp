@@ -478,29 +478,23 @@ int CommonHood::cg(int i, int j) {
   REP(k, ninter_i.size()) if(ninter_i[k] == j) ij_edge = true; 
   REP(k, ninter_j.size()) if(ninter_j[k] == i) ij_edge = true; 
 
-  int gain = 0;
+  //consider: mapping info (-2) + supernode in summary graph (-1)
+  int gain = -3;
 
-  if(fp == 0)
-    gain = 2 * inter.size() - 3;
-
+  //consider: removal and addition of edges
+  if(fp == 0) gain += 2 * inter.size();
   else if(fp == -1) {
-    gain = 2 * (inter.size() + ninter_i.size() + ninter_j.size()) - 3;
+    gain += 2 * (inter.size() + ninter_i.size() + ninter_j.size());
     if(ij_edge) gain -= 2;
   }
-  
-  else if(fp == 1) 
-    gain = 2 * inter.size() - 3;
+  else if(fp == 1) gain += 2 * inter.size();
 
-  if(i < G_.n) {
-    if(fp == -1) gain++;
-    else if(fp == 1 && !ij_edge) gain++;
-    else if(fp == 0 && ninter_i.size() == 0) gain++;
-  }
-
-  if(j < G_.n) {
-    if(fp == -1) gain++;
-    else if(fp == 1 && !ij_edge) gain++;
-    else if(fp == 0 && ninter_j.size() == 0) gain++;
+  //consider: removal of one or both of parent nodes
+  if(fp == -1) gain+=2;
+  else if(fp == 1 && !ij_edge) gain+=2;
+  else if(fp == 0){
+    if(ninter_i.size() == 0) gain++;
+    if(ninter_j.size() == 0) gain++;
   }
 
   return gain;
