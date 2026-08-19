@@ -1,0 +1,15 @@
+Dataset: K4.1.txt
+CGS Variant: E
+Threshold: 0
+Nodes in input graph (G): 4
+Edges in input graph (G): 6
+Compressed complement instead of input: False
+Nodes in compressed graph (G_c): 5
+Edges in compressed graph (G_c): 4
+Size of original graph (G): 16
+Size of compressed graph (G_c): 15
+Compression Ratio: 0.9375
+Compression time (in seconds): 4.8e-05
+Heap construction time (in seconds): 3.2e-05
+Iteration time (in seconds): 1.2e-05
+
