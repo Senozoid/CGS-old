@@ -1,0 +1,15 @@
+Dataset: Z3.2.txt
+CGS Variant: E
+Threshold: 0
+Nodes in input graph (G): 19
+Edges in input graph (G): 21
+Compressed complement instead of input: False
+Nodes in compressed graph (G_c): 22
+Edges in compressed graph (G_c): 15
+Size of original graph (G): 61
+Size of compressed graph (G_c): 54
+Compression Ratio: 0.885246
+Compression time (in seconds): 0.000112
+Heap construction time (in seconds): 7.3e-05
+Iteration time (in seconds): 3.3e-05
+
