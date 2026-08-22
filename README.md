@@ -1,15 +1,18 @@
-### Current work in progress
-I am keeping record of ongoing works because portions of it may otherwise be lost due to deletion of temporary test branches.
+## Regarding this Fork
 
-Patch-1 is about fixing a bug: when input graph is dense, complement is summarized instead; but this was not recorded in summary files, and the query-processing code did not check for it. 
-However, trying to fix this has caused other issues to be revealed (such as the RQ and SP codes expect to generate a fixed minimum number of unique node pairs to test, which results in an infinite loop for small graphs).
+### Current works in progress
 
-Patch-2 is about an improvement. To experiment with this, given an input graph `<name>.txt`, 2 copies of it are compressed in the following manner. For experimental reasons, in either case, input graph is compressed directly instead of complement, even if denser.
-* `<name>.1.txt` (compressed in branch TEMP): this compression assumes supernodes can track a flat list of ancestors, i.e., intermediate supernodes can be deleted
-* `<name>.2.txt` (compressed in branch TEMP-2): this compression assumes supernodes can track only a pair of parents, i.e., supernodes are permanent
+I am keeping a record of ongoing works because portions of it may otherwise be lost due to deletion of temporary test branches. Only the most immediate and relevant ones are briefly explained here; and if this still becomes long or complicated enough, I will move it into a different file.
+
++ Patch-1: When input graph is dense, complement is summarized instead; but this was not recorded in summary files, and the query-processing code did not check for it. 
++ Patch-3: Fixes the same bug as Patch-1, but it simply disables the code which creates the complement of the input graph. Thus all graphs, dense or sparse, are compressed similarly.
++ Patch-4: The RQ and SP codes expected to generate a fixed minimum number of unique node pairs to test, which resulted in an infinite loop for small graphs.
 
 ### About issues on this fork
-Only collaborators are allowed to open new issues on this fork. For anything regarding the original code, please visit the original repo. For this fork, please use the Discussions tab.
+
+For anything regarding the original code, please visit the original repo. For this fork, please try the Discussions tab first.
+
+---
 
 # CGS - Configurable Graph Summarization with Bounded Neighborhood Loss and Query Support
 ## Running CGS
