@@ -729,7 +729,7 @@ void CommonHood::update_heap(int a, int b, int idx) {
 
     REP(i, inter.size()) {
       int node_i = inter[i];
-      REP(j, inter.size()) {
+      REPN(j, i+1, inter.size()) {
         int node_j = inter[j];
         /*if(heap.exists({node_i, node_j}))*/ heap.decrease_key({node_i, node_j}, 2); 
       }
@@ -789,21 +789,21 @@ void CommonHood::update_heap(int a, int b, int idx) {
   else if(fp == -1) {
     REP(i, inter.size()) {
       int node_i = inter[i];
-      REP(j, inter.size()) {
+      REPN(j, i+1, inter.size()) {
         int node_j = inter[j];
         /*if(heap.exists({node_i, node_j}))*/ heap.decrease_key({node_i, node_j}, 2); 
       }
     }
     REP(i, ninter_i.size()) {
       int node_i = ninter_i[i];
-      REP(j, ninter_i.size()) {
+      REPN(j, i+1, ninter_i.size()) {
         int node_j = ninter_i[j];
         /*if(heap.exists({node_i, node_j}))*/ heap.decrease_key({node_i, node_j}, 2); 
       }
     }
     REP(i, ninter_j.size()) {
       int node_i = ninter_j[i];
-      REP(j, ninter_j.size()) {
+      REPN(j, i+1, ninter_j.size()) {
         int node_j = ninter_j[j];
         /*if(heap.exists({node_i, node_j}))*/ heap.decrease_key({node_i, node_j}, 2); 
       }
@@ -838,7 +838,7 @@ void CommonHood::update_heap(int a, int b, int idx) {
 
     REP(i, inter.size()) {
       int node_i = inter[i];
-      REP(j, inter.size()) {
+      REPN(j, i+1, inter.size()) {
         int node_j = inter[j];
         /*if(heap.exists({node_i, node_j}))*/ heap.decrease_key({node_i, node_j}, 2); 
       }
