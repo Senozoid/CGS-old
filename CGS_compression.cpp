@@ -416,12 +416,14 @@ CommonHood::CommonHood(Graph target, int type, vf thres) {
 
   G.input(target), fp = type, det = thres;
   // checking the complement graph
-  if( 1ll * m <= (1ll * n * (n-1)) / 4 ) G.input(target), fp = type, det = thres;
+  /* if( 1ll * m <= (1ll * n * (n-1)) / 4 ) */ G.input(target), fp = type, det = thres;
+  /*
   else {
     G.complement(target), fp = -type;
     det.assign(n, 0);
     REP(i, n) det[i] = thres[i] * G.d[i] / (n - (1 - thres[i]) * G.d[i]);
   }
+  */
 }
 CompressedGraph CommonHood::call() {
   clock_t start, end;
