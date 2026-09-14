@@ -56,159 +56,187 @@ vi Union(int n, vi I, vi J) {
 
   return result;
 }
+
+//-----------------------------------------------------------------------
+//--------------------------- Overhauled Heap ---------------------------
+//-----------------------------------------------------------------------
+
+/*
+Non-exhaustive list of changes (I forgot a lot of things I did, too messy to even diff later):
+  1. Using custom class UnordIntPair instead of pair<int,int> for strictly unordered int pairs (like node pairs)
+  2. Overhauled class fields: no convoluted referencing, and using unordered_map instead of map for hashmaps
+  3. Inlined/delegated/replaced/renamed some functions, including other minor improvements
+*/
+
+class UnordIntPair {
+	private:
+		int a, b;
+	
+	public:
+		UnordIntPair(int c, int d) : a(min(c,d)), b(max(c,d)) {}
+		bool operator==(const UnordIntPair& other) const {
+			return
+				(a==other.a && b==other.b)||
+				(b==other.a && a==other.b); //just in case
+		}
+		int first() const { return a; }
+		int second() const { return b; }
+};
+
+struct UIPHash {
+	size_t operator()(const UnordIntPair& np) const {
+		return static_cast<size_t>(np.first()) * 31 + static_cast<size_t>(np.second());
+	}
+};
+
 class Heap {
   private:
-  public:
-    vector< pair<int, pair<int, int> > > tree;
-    map< pair<int, int> , int > hash;
-    vi index;
-
-    Heap();
-    void push(int value, pair<int, int> node);
-    void insert(int value, pair<int, int> node);
-    void make_heap();
-    pair<int, pair<int, int> > top();
-    void pop();
-    void swap(int i, int j);
+	vector<pair<int, UnordIntPair>> tree;
+	unordered_map<UnordIntPair, int, UIPHash> index;
+	
+	int modify_key(UnordIntPair np, int mod){ //probably the most frequently called function
+		auto it = index.find(np);
+		if(it == index.end()) return -1; //do not check before calling
+		int idx = it->second;
+		tree[idx].first += mod;
+		return idx;
+	}
+    bool heap_swap(int i, int j); //replaces Heap::swap
     void heapify_up(int i);
     void heapify_down(int i);
-    bool empty();
-    bool exists(pair<int, int> node);
-    void decrease_key(pair<int, int> node, int value);
-    void increase_key(pair<int, int> node, int value);
-
-    void print(pair<int, int> node);
+    void print(int idx);
+	
+  public:
+    Heap(){
+		tree = { {-1, {-1,-1}} };
+	}
+	
+    bool empty(){return tree.size() <= 1;}
+    bool exists(UnordIntPair np){
+		return index.find(np) != index.end();
+	}
+    pair<int, UnordIntPair> peek(){ //replaces top
+		return empty()? tree[0]: tree[1];
+	}
+	
+    void push(int gain, UnordIntPair np);
+    void insert(int gain, UnordIntPair np);
+    pair<int, UnordIntPair> pop();
+	void remove(UnordIntPair np);
+	void heapify_all(); //replaces make_heap
+	
+	void decrease_key(UnordIntPair np, int decr) {
+		if(decr <= 0) return;
+		int idx = modify_key(np, -decr);
+		if(idx >= 1) heapify_down(idx);
+	}
+	void increase_key(UnordIntPair np, int incr) {
+		if(incr <= 0) return;
+		int idx = modify_key(np, incr);
+		if(idx > 1) heapify_up(idx);
+	}
+	
     void print_all();
 
 };
-Heap::Heap() {
-    tree.assign(1, {0, {0, 0}});
-    index.assign(1, -1);
+
+bool Heap::heap_swap(int i, int j) {
+	if(i<1 || j<1) return false;
+	else if(i==j) return true;
+	
+	index[tree[i].second] = j;
+	index[tree[j].second] = i;
+	
+	std::swap(tree[i], tree[j]);
+	return true;
 }
-bool Heap::empty() {
-    if(tree.size() <= 1) return true;
-    else return false;
-}
-void Heap::push(int value, pair<int, int> node) {
+void Heap::heapify_up(int i) { //preserve tail recursion
+    if(i <= 1 || i >= tree.size()) return;
 
-    if(hash[ node ] != 0) return;
+    int p = i/2;
 
-    int key = index.size();
-    hash[ node ] = key;
-
-    tree.push_back({value, node});
-    index.push_back(tree.size() - 1);
-
-    heapify_up(tree.size() - 1);
-}
-void Heap::insert(int value, pair<int, int> node) {
-    if(hash[ node ] != 0) return;
-
-    int key = index.size();
-    hash[ node ] = key;
-
-    tree.push_back({value, node});
-    index.push_back(tree.size() - 1);
-}
-void Heap::make_heap() {
-    REPN(i, 1, tree.size()) heapify_down(i);
-}
-void Heap::heapify_up(int i) {
-    if(i == 1) return;
-
-    int p = i / 2;
-    pair<int, pair<int, int> > cur = tree[i];
-    pair<int, pair<int, int> > par = tree[p];
-
-    if ( cur.first > par.first ) {
-        swap(i, p);
+    if (tree[i].first > tree[p].first) {
+        heap_swap(i, p);
         heapify_up(p);
     }
 }
-void Heap::heapify_down(int i) {
-    if(i >= tree.size()) return;
+void Heap::heapify_down(int i) { //preserve tail recursion
+    if(i < 1 || i >= tree.size()) return;
 
     int cl = 2*i;
-    int cr = 2*i + 1;
+    int cr = cl+1;
 
     int swap_with = -1;
 
-    if(cl < tree.size() && cr < tree.size()) {
-        if( tree[cl].first >= tree[cr].first && tree[cl].first > tree[i].first ) swap_with = cl;
-        else if( tree[cr].first > tree[cl].first && tree[cr].first > tree[i].first ) swap_with = cr;
+    if(cr < tree.size()) {
+		if(tree[cl].first > tree[i].first && tree[cl].first >= tree[cr].first) swap_with = cl;
+        else if(tree[cr].first > tree[i].first && tree[cr].first >= tree[cl].first) swap_with = cr;
     }
-    else if( cl < tree.size() && tree[cl].first > tree[i].first ) swap_with = cl;
-    else if( cr < tree.size() && tree[cr].first > tree[i].first ) swap_with = cr;
+    else if(cl < tree.size() && tree[cl].first > tree[i].first) swap_with = cl;
 
-    if(swap_with != -1) {
-        swap(i, swap_with);
+	if(swap_with > i) { //just to not have to use the call stack
+        heap_swap(i, swap_with);
         heapify_down(swap_with);
     }
 }
-void Heap::swap(int i, int j) {
-    pair<int, pair<int, int> > temp_1 = tree[i];
-    tree[i] = tree[j];
-    tree[j] = temp_1;
 
-    int idx_1 = hash[ tree[i].second ];
-    int idx_2 = hash[ tree[j].second ];
-
-    int temp_2 = index[idx_1];
-    index[idx_1] = index[idx_2];
-    index[idx_2] = temp_2;
+void Heap::push(int gain, UnordIntPair np) {
+    insert(gain, np);
+    heapify_up(tree.size()-1);
 }
-pair<int, pair<int, int> > Heap::top() {
-    if(empty()) return {0, {0, 0}};
-    return tree[1];
+void Heap::insert(int gain, UnordIntPair np) { //if no mapping existed, then it will be assigned here, so need for index.find(np)
+	if(index[np] != 0) return;
+    tree.push_back({gain, np});
+    index[np] = tree.size()-1;
 }
-void Heap::pop() {
-    if(tree.size() > 2) {
-        swap(1, tree.size() - 1);
-        hash.erase( hash.find( tree[tree.size() - 1].second ) );
+pair<int, UnordIntPair> Heap::pop(){
+	pair<int, UnordIntPair> top = peek();
+	if(top.first < 0) return top;
+	
+	UnordIntPair np = top.second;
+	if(tree.size() == 2) {
         tree.pop_back();
-        heapify_down(1);
+        index.erase(np);
     }
-
-    else if(tree.size() == 2) {
-        hash.erase( hash.find( tree[1].second ) );
-        tree.pop_back();
-    }
+	else {
+		heap_swap(1, tree.size()-1);
+		tree.pop_back();
+		index.erase(np);
+		heapify_down(1);
+	}
+	return top;
 }
-void Heap::decrease_key(pair<int, int> node, int value) {
-    int key = hash[ node ];
-    if(key == 0) return;
+void Heap::remove(UnordIntPair np){
+	auto it = index.find(np);
+	if(it == index.end()) return;
 
-    int idx = index[key];
-    pair<int, pair<int, int> > old = tree[idx];
-    tree[idx] = {old.first - value, old.second};
-
-    heapify_down(idx);
+	int idx = it->second;
+	if(tree.size() == 2) {
+		tree.pop_back();
+		index.erase(it);
+	}
+	else {
+		heap_swap(idx, tree.size()-1);
+		tree.pop_back();
+		index.erase(it);
+		heapify_down(idx);
+		heapify_up(idx);
+	}
 }
-bool Heap::exists(pair<int, int> node) {
-    if(hash[ node ] == 0) return false;
-    return true;
+void Heap::heapify_all(){
+	int n = tree.size()-1;
+	if(n <= 1) return;
+	for(int i = n/2; i > 0; i--) heapify_down(i);
 }
-void Heap::increase_key(pair<int, int> node, int value) {
-    int key = hash[ node ];
-    if(key == 0) return;
 
-    int idx = index[key];
-    pair<int, pair<int, int> > old = tree[idx];
-    tree[idx] = {old.first + value, old.second};
-
-    heapify_up(idx);
-}
-void Heap::print(pair<int, int> node) {
-    int key = hash[ node ];
-    if(key == 0) return;
-    
-    pair< int, pair<int,int> > item = tree[index[key]];
-    cout << item.second.first << ", " << item.second.second << " : " << item.first << "\n";
+void Heap::print(int idx) { //private
+    if(idx < 1 || idx >= tree.size()) return;
+    pair<int, UnordIntPair> item = tree[idx];
+    cout << item.second.first() << ", " << item.second.second() << " : " << item.first << "\n";
 }
 void Heap::print_all() {
-
-    REP(i, index.size()) {
-    pair< int, pair<int,int> > item = tree[index[i]];
+    REP(i, tree.size()) {
+		print(i);
     }
 }
 
@@ -444,11 +472,10 @@ void CommonHood::greedy_cn() {
 
   start = clock();
   while(!heap.empty()) {
-    pair< int, pair<int,int> > top = heap.top();
-    heap.pop();
+    pair<int, UnordIntPair> top = heap.pop();
     int gain = top.first;
-    int i = top.second.first;
-    int j = top.second.second;
+    int i = top.second.first();
+    int j = top.second.second();
     if(gain <= 0) break;
     bool flag = G_.exists[i] && G_.exists[j] && is_safe_merge(i, j);
     if(flag) {
@@ -704,23 +731,23 @@ void CommonHood::update_heap(int a, int b, int idx) {
       int node_i = inter[i];
       REP(j, inter.size()) {
         int node_j = inter[j];
-        if(heap.exists({node_i, node_j})) heap.decrease_key({node_i, node_j}, 2); 
+        /*if(heap.exists({node_i, node_j}))*/ heap.decrease_key({node_i, node_j}, 2); 
       }
     }
     REP(i, inter.size()) {
       int node_i = inter[i];
       REP(j, ninter_i.size()) {
         int node_j = ninter_i[j];
-        if(heap.exists({node_i, node_j})) heap.decrease_key({node_i, node_j}, 2); 
-        if(heap.exists({node_j, node_i})) heap.decrease_key({node_j, node_i}, 2); 
+        /*if(heap.exists({node_i, node_j}))*/ heap.decrease_key({node_i, node_j}, 2); 
+        /*if(heap.exists({node_j, node_i}))*/ heap.decrease_key({node_j, node_i}, 2); 
       }
     }
     REP(i, inter.size()) {
       int node_i = inter[i];
       REP(j, ninter_j.size()) {
         int node_j = ninter_j[j];
-        if(heap.exists({node_i, node_j})) heap.decrease_key({node_i, node_j}, 2);
-        if(heap.exists({node_j, node_i})) heap.decrease_key({node_j, node_i}, 2);
+        /*if(heap.exists({node_i, node_j}))*/ heap.decrease_key({node_i, node_j}, 2);
+        /*if(heap.exists({node_j, node_i}))*/ heap.decrease_key({node_j, node_i}, 2);
       }
     }
 
@@ -748,10 +775,14 @@ void CommonHood::update_heap(int a, int b, int idx) {
       int cnt = 0;
       int node = neighbourhood[i];
       REP(j, G_.adj[node].size()) if(v[ G_.adj[node][j] ]) cnt++;
-      if( heap.exists({a, node}) ) heap.decrease_key({a, node}, 2*cnt);
-      if( heap.exists({b, node}) ) heap.decrease_key({b, node}, 2*cnt);
-      if( heap.exists({node, a}) ) heap.decrease_key({node, a}, 2*cnt);
-      if( heap.exists({node, b}) ) heap.decrease_key({node, b}, 2*cnt);
+      //if( heap.exists({a, node}) ) 
+	  heap.decrease_key({a, node}, 2*cnt);
+      //if( heap.exists({b, node}) ) 
+	  heap.decrease_key({b, node}, 2*cnt);
+      //if( heap.exists({node, a}) ) 
+	  heap.decrease_key({node, a}, 2*cnt);
+      //if( heap.exists({node, b}) ) 
+	  heap.decrease_key({node, b}, 2*cnt);
     }
   }
 
@@ -760,37 +791,37 @@ void CommonHood::update_heap(int a, int b, int idx) {
       int node_i = inter[i];
       REP(j, inter.size()) {
         int node_j = inter[j];
-        if(heap.exists({node_i, node_j})) heap.decrease_key({node_i, node_j}, 2); 
+        /*if(heap.exists({node_i, node_j}))*/ heap.decrease_key({node_i, node_j}, 2); 
       }
     }
     REP(i, ninter_i.size()) {
       int node_i = ninter_i[i];
       REP(j, ninter_i.size()) {
         int node_j = ninter_i[j];
-        if(heap.exists({node_i, node_j})) heap.decrease_key({node_i, node_j}, 2); 
+        /*if(heap.exists({node_i, node_j}))*/ heap.decrease_key({node_i, node_j}, 2); 
       }
     }
     REP(i, ninter_j.size()) {
       int node_i = ninter_j[i];
       REP(j, ninter_j.size()) {
         int node_j = ninter_j[j];
-        if(heap.exists({node_i, node_j})) heap.decrease_key({node_i, node_j}, 2); 
+        /*if(heap.exists({node_i, node_j}))*/ heap.decrease_key({node_i, node_j}, 2); 
       }
     }
     REP(i, inter.size()) {
       int node_i = inter[i];
       REP(j, ninter_i.size()) {
         int node_j = ninter_i[j];
-        if(heap.exists({node_i, node_j})) heap.decrease_key({node_i, node_j}, 2); 
-        if(heap.exists({node_j, node_i})) heap.decrease_key({node_j, node_i}, 2); 
+        /*if(heap.exists({node_i, node_j}))*/ heap.decrease_key({node_i, node_j}, 2); 
+        /*if(heap.exists({node_j, node_i}))*/ heap.decrease_key({node_j, node_i}, 2); 
       }
     }
     REP(i, inter.size()) {
       int node_i = inter[i];
       REP(j, ninter_j.size()) {
         int node_j = ninter_j[j];
-        if(heap.exists({node_i, node_j})) heap.decrease_key({node_i, node_j}, 2);
-        if(heap.exists({node_j, node_i})) heap.decrease_key({node_j, node_i}, 2);
+        /*if(heap.exists({node_i, node_j}))*/ heap.decrease_key({node_i, node_j}, 2);
+        /*if(heap.exists({node_j, node_i}))*/ heap.decrease_key({node_j, node_i}, 2);
       }
     }
   }
@@ -801,7 +832,7 @@ void CommonHood::update_heap(int a, int b, int idx) {
       int node_i = ninter_i[i];
       REP(j, ninter_j.size()) {
         int node_j = ninter_j[j];
-        if(heap.exists({node_i, node_j})) heap.increase_key({node_i, node_j}, 2); 
+        /*if(heap.exists({node_i, node_j}))*/ heap.increase_key({node_i, node_j}, 2); 
       }
     }
 
@@ -809,7 +840,7 @@ void CommonHood::update_heap(int a, int b, int idx) {
       int node_i = inter[i];
       REP(j, inter.size()) {
         int node_j = inter[j];
-        if(heap.exists({node_i, node_j})) heap.decrease_key({node_i, node_j}, 2); 
+        /*if(heap.exists({node_i, node_j}))*/ heap.decrease_key({node_i, node_j}, 2); 
       }
     }
   }
