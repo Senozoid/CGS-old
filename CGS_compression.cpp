@@ -73,11 +73,11 @@ class UnordIntPair {
 		int a, b;
 	
 	public:
-		UnordIntPair(int c, int d) : a(min(c,d)), b(max(c,d)) {}
+		UnordIntPair(int c, int d) : a(c), b(d) {} //preserve passing order
 		bool operator==(const UnordIntPair& other) const {
 			return
 				(a==other.a && b==other.b)||
-				(b==other.a && a==other.b); //just in case
+				(b==other.a && a==other.b);
 		}
 		int first() const { return a; }
 		int second() const { return b; }
@@ -85,7 +85,8 @@ class UnordIntPair {
 
 struct UIPHash {
 	size_t operator()(const UnordIntPair& np) const {
-		return static_cast<size_t>(np.first()) * 31 + static_cast<size_t>(np.second());
+		auto [a, b] = minmax(np.first(), np.second());
+		return static_cast<size_t>(a)*31 + static_cast<size_t>(b);
 	}
 };
 
