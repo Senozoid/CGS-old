@@ -85,7 +85,9 @@ class UnordIntPair {
 
 struct UIPHash {
 	size_t operator()(const UnordIntPair& np) const {
-		auto [a, b] = minmax(np.first(), np.second());
+		int a = np.first(), b = np.second();
+		if(a > b) std::swap(a, b);
+		
 		return static_cast<size_t>(a)*31 + static_cast<size_t>(b);
 	}
 };
