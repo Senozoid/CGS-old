@@ -380,6 +380,34 @@ void OutputController::print_analysis() {
   neighbourhood_loss();
   per_node_loss();
   neighbourhood_times();
+  
+  //TODO: temporary check for E variant
+  bool is_perfectly_lossless = true;
+  long long wrong_adj = 0;
+
+  REP(i, G.n) {
+      // Get the original edges and the decompressed edges
+      vi orig = G.adj[i];
+      vi comp = G_.NQ(i);
+
+      // Sort them to ensure ordering differences don't trigger a false positive
+      sort(orig.begin(), orig.end());
+      sort(comp.begin(), comp.end());
+
+      // Direct comparison
+      if(orig != comp) {
+          is_perfectly_lossless = false;
+          wrong_adj++;
+      }
+  }
+
+  if(is_perfectly_lossless) {
+      cout << "\nExhaustive neighborhood matching: Lossless\n";
+  } else {
+      cout << "\nExhaustive neighborhood matching: Mismatch count = " << wrong_adj << "\n";
+  }
+  //TODO: end of temporary check
+  
   cout << "\n\n"; 
   std::cout.rdbuf(coutbuf); // reset to standard output again  
 }
