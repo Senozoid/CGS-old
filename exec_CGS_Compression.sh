@@ -1,11 +1,12 @@
 #!/bin/bash
 rm a.out
 g++ -O3 CGS_compression.cpp -w
+chmod +x a.out
 
 # $1 represents dataset name
 # $2 represents the CGS Algorithm i.e, {I,E,U} for {CGS-I, CGS-E, CGS-U} respectively.
 # $3 represents the threshold value [0,1]
 
-./a.out "./Dataset/$1" "./Compression_Results/$1" $1 $2 $3 &
+nohup ./a.out "./Dataset/$1" "./Compression_Results/$1" $1 $2 $3 > compression.log 2>&1 &
 
 echo "Code running in the backgroud. Results will be saved in the 'Compression_Results' folder."
