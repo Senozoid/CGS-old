@@ -141,25 +141,27 @@ int Graph::SP(int i, int j) {
         if(!visited[neigh]) {
             visited[neigh] = true;
             parent[neigh] = node;
+			/*
             if(neigh == j) {
-              q.empty();
+              q.empty(); //TODO: fix
               break;
             }
+			*/
             q.push(neigh);
         }
       }
     }
 
-    // If path does not exist, return -1
+    //If path does not exist:
     if(!visited[j]) return -1;
 
-    //  Calculate path length
+    //Calculate path length by backtracking:
     int node = j;
-    while( parent[node] !=-1) {
+    while( parent[node] != -1) {
       path += 1;
       node = parent[node];
     }
-    return path; 
+    return path;
 }
 
 //-----------------------------------------------------------------------
@@ -312,7 +314,7 @@ int CompressedGraph::SP(int i, int j) {
     vi parent(n_, -1);
     queue<int> q;
     int path = 0;
-    bool flag = 0;
+    //bool flag = 0;
 
     visited[i] = true;
     q.push(i);
@@ -321,19 +323,23 @@ int CompressedGraph::SP(int i, int j) {
       int node = q.front();
       q.pop();
       
-      if(node == j) flag = true;
+      if(node == j) break; //flag = true;
+	  
+	  /*
       else {
         vi sub_nodes = sN_cached(node);
-        REP(l, sub_nodes.size()) if(sub_nodes[l] == j) flag = true;
+        REP(l, sub_nodes.size()) if(sub_nodes[l] == j) break; //flag = true;
       }
-      if(flag == true) break;
-      
-      vi N = NQ(node);
+      //if(flag == true) break;
+      */
+	  
+      vi N = NQ(node); //TODO: there is a better way
       REP(k, N.size()) {
         int neigh = N[k];
         if(!visited[neigh]) {
             visited[neigh] = true;
             parent[neigh] = node;
+			/*
             //  Checking if the node == j or if the node contains j
             if(neigh == j) flag = true;
             else {
@@ -348,25 +354,26 @@ int CompressedGraph::SP(int i, int j) {
             }
 
             if(flag == true) {
-              q.empty();
+              q.empty(); //TODO: fix
               break;
             }
+			*/
             q.push(neigh);
         }
       }
     }
 
-    // If path does not exist, return 0
-    if(!flag) return -1;
+    //If path does not exist:
+    if(!visited[j]) return -1;
 
-    //  Calculate path length
+    //Calculate path length by backtracking:
     int node = j;
-    while( parent[node] !=-1) {
+    while( parent[node] != -1) {
       path += 1;
       node = parent[node];
     }
 
-    return path; 
+    return path;
 }
 
 //-----------------------------------------------------------------------
@@ -457,6 +464,7 @@ void OutputController::reachability_query(int k) {
   // Reachability querying using shortest path querying 
 
   vii node_pairs = get_node_pairs(G.n, k);
+  k = node_pairs.size();
 
   REP(i, k){
     
@@ -507,29 +515,24 @@ void OutputController::reachability_query(int k) {
 
 vii OutputController::get_node_pairs(int n, int k) {
   vii pairs;
+  
+  long long max_pairs = (1ll* n*(n-1))/2;
+  if (k > max_pairs) k = max_pairs;
+
+  set<pair<int, int>> used_pairs; //TODO: Why not unordered_set?
 
   while(pairs.size() != k) {
-    pair<int, int> node_pair;
     int i = rand() % n;
     int j = rand() % n;
     while (i == j) i = rand() % n;
 
-    if(i<j) {
-      node_pair.first = i;
-      node_pair.second = j;
-    }
-    else {
-      node_pair.first = j;
-      node_pair.second = i;
-    }
+    //Enforce {smaller, larger} order to treat {i,j} and {j,i} identically
+    pair<int,int> node_pair = {min(i,j), max(i,j)}; //TODO: Why not use std::minmax?
 
-    bool exists = false;
-    REP(m, pairs.size()) {
-      if(pairs[m].first == node_pair.first)
-        if(pairs[m].second == node_pair.second)
-          exists = true;
+    if (used_pairs.find(node_pair) == used_pairs.end()) {
+        used_pairs.insert(node_pair);
+        pairs.push_back(node_pair);
     }
-    if(!exists) pairs.push_back(node_pair);
   }
   return pairs;
 }
