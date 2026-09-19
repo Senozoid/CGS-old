@@ -85,7 +85,7 @@ class UnordIntPair {
 
 struct UIPHash {
 	size_t operator()(const UnordIntPair& np) const {
-		int a = np.first(), b = np.second();
+		unsigned long long a = np.first(), b = np.second();
 		if(a > b) std::swap(a, b);
 		
 		unsigned long long key = (a << 32) | b; // if sizeof(int) = sizeof(ULL) then use golden ratio prime: a^(b*0x9e3779b97f4a7c15ULL)
