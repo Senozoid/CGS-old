@@ -1,0 +1,15 @@
+Dataset: SE.txt
+CGS Variant: E
+Threshold: 0
+Nodes in input graph (G): 75879
+Edges in input graph (G): 405740
+Compressed complement instead of input: False
+Nodes in compressed graph (G_c): 121572
+Edges in compressed graph (G_c): 220644
+Size of original graph (G): 887359
+Size of compressed graph (G_c): 627037
+Compression Ratio: 0.706633
+Compression time (in seconds): 630.053
+Heap construction time (in seconds): 362.961
+Iteration time (in seconds): 267.068
+
