@@ -1,0 +1,15 @@
+Dataset: GF.txt
+CGS Variant: E
+Threshold: 0
+Nodes in input graph (G): 50515
+Edges in input graph (G): 819090
+Compressed complement instead of input: False
+Nodes in compressed graph (G_c): 120305
+Edges in compressed graph (G_c): 350105
+Size of original graph (G): 1688695
+Size of compressed graph (G_c): 957012
+Compression Ratio: 0.566717
+Compression time (in seconds): 379.59
+Heap construction time (in seconds): 260.76
+Iteration time (in seconds): 118.793
+
