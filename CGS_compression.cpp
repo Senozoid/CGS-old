@@ -88,7 +88,16 @@ struct UIPHash {
 		int a = np.first(), b = np.second();
 		if(a > b) std::swap(a, b);
 		
-		return static_cast<size_t>(a)*31 + static_cast<size_t>(b);
+		unsigned long long key = (a << 32) | b; // if sizeof(int) = sizeof(ULL) then use golden ratio prime: a^(b*0x9e3779b97f4a7c15ULL)
+
+		// "fmix64" from MurmurHash3 by Austin Appleby (SplitMix64 finalizer):
+		key ^= key >> 33;
+		key *= 0xff51afd7ed558ccdULL;
+		key ^= key >> 33;
+		key *= 0xc4ceb9fe1a85ec53ULL;
+		key ^= key >> 33;
+
+		return static_cast<size_t>(key);
 	}
 };
 
