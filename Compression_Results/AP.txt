@@ -12,3 +12,18 @@ Compression time (in seconds): 131.31
 Heap construction time (in seconds): 24.56
 Iteration time (in seconds): 106.74
 
+Dataset: AP.txt
+CGS Variant: E
+Threshold: 0
+Nodes in input graph (G): 18772
+Edges in input graph (G): 198050
+Compressed complement instead of input: False
+Nodes in compressed graph (G_c): 34711
+Edges in compressed graph (G_c): 48099
+Size of original graph (G): 414872
+Size of compressed graph (G_c): 161974
+Compression Ratio: 0.390419
+Compression time (in seconds): 61.677
+Heap construction time (in seconds): 32.2217
+Iteration time (in seconds): 29.4475
+
