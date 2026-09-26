@@ -9,67 +9,7 @@ Edges in compressed graph (G_c): 301691
 Size of original graph (G): 1015720
 Size of compressed graph (G_c): 807433
 Compression Ratio: 0.794937
-Compression time (in seconds): 284.06
-Heap construction time (in seconds): 228.601
-Iteration time (in seconds): 55.4101
-
-Dataset: SD.txt
-CGS Variant: E
-Threshold: 0
-Nodes in input graph (G): 77360
-Edges in input graph (G): 469180
-Compressed complement instead of input: False
-Nodes in compressed graph (G_c): 126142
-Edges in compressed graph (G_c): 301691
-Size of original graph (G): 1015720
-Size of compressed graph (G_c): 807433
-Compression Ratio: 0.794937
-Compression time (in seconds): 303.307
-Heap construction time (in seconds): 244.694
-Iteration time (in seconds): 58.5707
-
-Dataset: SD.txt
-CGS Variant: E
-Threshold: 0
-Nodes in input graph (G): 77360
-Edges in input graph (G): 469180
-Compressed complement instead of input: False
-Nodes in compressed graph (G_c): 126142
-Edges in compressed graph (G_c): 301691
-Size of original graph (G): 1015720
-Size of compressed graph (G_c): 807433
-Compression Ratio: 0.794937
-Compression time (in seconds): 318.421
-Heap construction time (in seconds): 256.712
-Iteration time (in seconds): 61.6746
-
-Dataset: SD.txt
-CGS Variant: E
-Threshold: 0
-Nodes in input graph (G): 77360
-Edges in input graph (G): 469180
-Compressed complement instead of input: False
-Nodes in compressed graph (G_c): 126142
-Edges in compressed graph (G_c): 301691
-Size of original graph (G): 1015720
-Size of compressed graph (G_c): 807433
-Compression Ratio: 0.794937
-Compression time (in seconds): 299.198
-Heap construction time (in seconds): 243.573
-Iteration time (in seconds): 55.5849
-
-Dataset: SD.txt
-CGS Variant: E
-Threshold: 0
-Nodes in input graph (G): 77360
-Edges in input graph (G): 469180
-Compressed complement instead of input: False
-Nodes in compressed graph (G_c): 126142
-Edges in compressed graph (G_c): 301691
-Size of original graph (G): 1015720
-Size of compressed graph (G_c): 807433
-Compression Ratio: 0.794937
-Compression time (in seconds): 311.96
-Heap construction time (in seconds): 248.902
-Iteration time (in seconds): 63.0176
+Compression time (in seconds): 318.037
+Heap construction time (in seconds): 259.012
+Iteration time (in seconds): 58.9955
 
