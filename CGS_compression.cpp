@@ -436,7 +436,7 @@ void CommonHood::greedy_cn() {
   clock_t start, end;
   start = clock();
   build_heap();
-  heap.print_all();
+  //heap.print_all(); //TODO: why was this here?
   end = clock();
   heap_construction_time = double(end - start) / double(CLOCKS_PER_SEC);
 
