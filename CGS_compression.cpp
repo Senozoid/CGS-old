@@ -84,7 +84,7 @@ class UnordIntPair {
 };
 
 struct UIPHash {
-	size_t operator()(const UnordIntPair& np) const {
+	size_t operator()(const UnordIntPair& np) const { // assumes that both ints are positive
 		unsigned long long a = np.first(), b = np.second();
 		if(a > b) std::swap(a, b);
 		
@@ -203,7 +203,7 @@ void Heap::insert(int gain, UnordIntPair np) { //if no mapping existed, then it 
 }
 pair<int, UnordIntPair> Heap::pop(){
 	pair<int, UnordIntPair> top = peek();
-	if(top.first < 0) return top;
+	if(top.first < 0) return top; //only because we know the Heap will be discarded now
 	
 	UnordIntPair np = top.second;
 	if(tree.size() == 2) {
