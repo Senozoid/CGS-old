@@ -14,7 +14,136 @@ vi remove(vi vec, int i, int j) {
     vec.clear();
     return temp;
 }
-vvi intersection(int n, vi I, vi J) {
+
+
+class SetOp{
+	private:
+		inline thread_local static vector<int> ADJ;
+		inline thread_local static int TKN = 0;
+		
+		static void update(const int n){
+			bool atcap = ADJ.size() < n;
+			if(TKN >= INT_MAX-2){
+				if(atcap) ADJ.assign(n,0);
+				else std::fill(ADJ.begin(), ADJ.end(), 0);
+				TKN = 1;
+			}
+			else{
+				if(atcap) ADJ.resize(n);
+				TKN += 2;
+			}
+		}
+		
+	
+	public:
+		static int part(const int n, vi& I, vi& J);
+		static int inter_count(const int n, const vi& I, const vi& J);
+		static int union_count(const int n, const vi& I, const vi& J);
+		static vi inter_copy(const int n, const vi& I, const vi& J);
+		static vi union_copy(const int n, const vi& I, const vi& J);
+};
+
+
+int SetOp::part(const int n, vi& I, vi& J){ //TODO: replace intersection and union functions
+	//returns the number of common elements, and puts exclusive elements early in each vi
+	
+	bool ord = I.size() > J.size();
+	vi& small = ord ? J : I;
+	if(small.empty()) return 0;
+	vi& large = ord ? I : J;
+	
+	update(n);
+	for(int node : small) ADJ[node] = TKN;
+	int count = 0, sizeS = small.size(), sizeL = large.size();
+	
+	for(int k=0; k<sizeL;){
+		int node=large[k];
+		if(ADJ[node] == TKN){
+			std::swap(large[k], large[--sizeL]);
+			if(++count==sizeS) return count;
+			ADJ[node]++;
+		}
+		else k++;
+	}
+	
+	for(int i=0, j=0; i<sizeS && j<count;){
+		if(ADJ[small[i]] == TKN+1){
+			std::swap(small[i], small[--sizeS]);
+			j++;
+		}
+		else i++;
+	}
+	
+	return count;
+}
+
+int SetOp::inter_count(const int n, const vi& I, const vi& J){
+	//returns the size of intersection, does not mutate passed vectors
+	
+	bool ord = I.size() > J.size();
+	const vi& small = ord ? J : I;
+	if(small.empty()) return 0;
+	const vi& large = ord ? I : J;
+
+	update(n);
+	for(int node : small) ADJ[node] = TKN;
+	
+	int count = 0;
+	for(int node : large){
+		if(ADJ[node] == TKN) count++;
+	}
+
+	return count;
+}
+
+int SetOp::union_count(const int n, const vi& I, const vi& J){
+	//returns the size of union, does not mutate passed vectors
+	
+	return I.size() + J.size() - inter_count(n, I, J);
+}
+
+vi SetOp::inter_copy(const int n, const vi& I, const vi& J){
+	//returns a copy of intersection, does not mutate passed vectors
+
+	vi inter_v;
+	
+	bool ord = I.size() > J.size();
+	const vi& small = ord ? J : I;
+	if(small.empty()) return inter_v;
+	const vi& large = ord ? I : J;
+
+	update(n);
+	for(int node : small) ADJ[node] = TKN;
+	
+	for(int node : large){
+		if(ADJ[node] == TKN) inter_v.push_back(node);
+	}
+
+	return inter_v;
+}
+
+vi SetOp::union_copy(const int n, const vi& I, const vi& J){
+	//returns a copy of union, does not mutate passed vectors
+	
+	bool ord = I.size() > J.size();
+	const vi& small = ord ? J : I;
+	const vi& large = ord ? I : J;
+	
+	if(small.empty()) return large;
+	
+	vi union_v(large);
+	update(n);
+	for(int node : union_v) ADJ[node] = TKN;
+	
+	for(int node : small){
+		if(ADJ[node] != TKN) union_v.push_back(node);
+	}
+	
+	return union_v;
+}
+
+
+vvi intersection(int n, vi I, vi J) { //TODO: replace and deprecate
   vector< bool > v(n, 0);
   vi inter;
   vi ninter_i, ninter_j;
@@ -38,7 +167,7 @@ vvi intersection(int n, vi I, vi J) {
 
   return result;
 }
-vi Union(int n, vi I, vi J) {
+vi Union(int n, vi I, vi J) { //TODO: replace and deprecate
   vector< bool > v(n, 0);
   vi result;
 
@@ -468,7 +597,7 @@ void CommonHood::build_heap() {
     }
   }
 }
-int CommonHood::cg(int i, int j) {
+int CommonHood::cg(int i, int j) { //probably the most frequently called function
   vvi sets = intersection(G_.n_, G_.adj[i], G_.adj[j]);
   vi inter = sets[0];
   vi ninter_i = sets[1];
