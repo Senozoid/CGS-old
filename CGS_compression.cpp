@@ -8,11 +8,8 @@ using namespace std;
 #define REP(A, B) for(int A = 0; A < B; A++)
 #define REPN(A, B, C) for(int A = B; A < C; A++)
 
-vi remove(vi vec, int i, int j) {
-    vi temp;
-    REP(k, vec.size()) if(vec[k] != i && vec[k] != j) temp.push_back(vec[k]);
-    vec.clear();
-    return temp;
+inline void remove_inplace(vi& vec, int i, int j) { //replaces remove(vi,int,int)
+    erase_if(vec, [i, j] (int val) {return val==i||val==j;} );
 }
 vvi intersection(int n, vi I, vi J) {
   vector< bool > v(n, 0);
@@ -564,8 +561,8 @@ bool CommonHood::is_safe_merge(int i, int j) {
 
   else if(fp == 1) {
 
-    nI = remove(nI, j, -1);
-    nJ = remove(nJ, i, -1);
+    remove_inplace(nI, j, -1);
+    remove_inplace(nJ, i, -1);
 
     REP(k, I.size()) {
       int node = I[k];
@@ -619,29 +616,29 @@ void CommonHood::merge(int i, int j) {
   if(fp == 0) {
     REP(k, inter.size()) {
       int node = inter[k];
-      G_.adj[node] = remove(G_.adj[node], i, j);
+      remove_inplace(G_.adj[node], i, j);
       G_.adj[node].push_back(idx);
     }
   } else {
     REP(k, inter.size()) {
       int node = inter[k];
-      G_.adj[node] = remove(G_.adj[node], i, j);
+      remove_inplace(G_.adj[node], i, j);
       G_.adj[node].push_back(idx);
     }
 
     REP(k, ninter_i.size()) {
       int node = ninter_i[k];
-      G_.adj[node] = remove(G_.adj[node], i, j);
+      remove_inplace(G_.adj[node], i, j);
       if(fp == 1) G_.adj[node].push_back(idx);
     }
 
     REP(k, ninter_j.size()) {
       int node = ninter_j[k];
-      G_.adj[node] = remove(G_.adj[node], i, j);
+      remove_inplace(G_.adj[node], i, j);
       if(fp == 1) G_.adj[node].push_back(idx);
     }
 
-    G_.adj[idx] = remove(G_.adj[idx], i, j);
+    remove_inplace(G_.adj[idx], i, j);
   }
   
   // Updating: neighbourhoods of i and j; heap; degrees
@@ -847,8 +844,8 @@ void CommonHood::update_degree(int i, int j) {
   }
 
   else if(fp == 1) {
-    nI = remove(nI, j, -1);
-    nJ = remove(nJ, i, -1);
+    remove_inplace(nI, j, -1);
+    remove_inplace(nJ, i, -1);
   
     REP(k, I.size()) G_.d[I[k]] += nJ.size();
     REP(k, nI.size()) G_.d[nI[k]] += J.size();
