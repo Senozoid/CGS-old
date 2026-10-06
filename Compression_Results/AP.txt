@@ -58,3 +58,123 @@ Compression time (in seconds): 30.4627
 Heap construction time (in seconds): 20.5748
 Iteration time (in seconds): 9.87955
 
+Dataset: AP.txt
+CGS Variant: E
+Threshold: 0
+Nodes in input graph (G): 18772
+Edges in input graph (G): 198050
+Compressed complement instead of input: False
+Nodes in compressed graph (G_c): 34695
+Edges in compressed graph (G_c): 48128
+Size of original graph (G): 414872
+Size of compressed graph (G_c): 161982
+Compression Ratio: 0.390438
+Compression time (in seconds): 27.5703
+Heap construction time (in seconds): 18.1447
+Iteration time (in seconds): 9.41772
+
+Dataset: AP.txt
+CGS Variant: E
+Threshold: 0
+Nodes in input graph (G): 18772
+Edges in input graph (G): 198050
+Compressed complement instead of input: False
+Nodes in compressed graph (G_c): 34695
+Edges in compressed graph (G_c): 48128
+Size of original graph (G): 414872
+Size of compressed graph (G_c): 161982
+Compression Ratio: 0.390438
+Compression time (in seconds): 29.6132
+Heap construction time (in seconds): 19.8467
+Iteration time (in seconds): 9.75663
+
+Dataset: AP.txt
+CGS Variant: E
+Threshold: 0
+Nodes in input graph (G): 18772
+Edges in input graph (G): 198050
+Compressed complement instead of input: False
+Nodes in compressed graph (G_c): 34695
+Edges in compressed graph (G_c): 48128
+Size of original graph (G): 414872
+Size of compressed graph (G_c): 161982
+Compression Ratio: 0.390438
+Compression time (in seconds): 28.7774
+Heap construction time (in seconds): 19.1567
+Iteration time (in seconds): 9.6121
+
+Dataset: AP.txt
+CGS Variant: E
+Threshold: 0
+Nodes in input graph (G): 18772
+Edges in input graph (G): 198050
+Compressed complement instead of input: False
+Nodes in compressed graph (G_c): 34695
+Edges in compressed graph (G_c): 48128
+Size of original graph (G): 414872
+Size of compressed graph (G_c): 161982
+Compression Ratio: 0.390438
+Compression time (in seconds): 28.2527
+Heap construction time (in seconds): 18.7194
+Iteration time (in seconds): 9.52541
+
+Dataset: AP.txt
+CGS Variant: E
+Threshold: 0
+Nodes in input graph (G): 18772
+Edges in input graph (G): 198050
+Compressed complement instead of input: False
+Nodes in compressed graph (G_c): 34695
+Edges in compressed graph (G_c): 48128
+Size of original graph (G): 414872
+Size of compressed graph (G_c): 161982
+Compression Ratio: 0.390438
+Compression time (in seconds): 28.5367
+Heap construction time (in seconds): 18.967
+Iteration time (in seconds): 9.56188
+
+Dataset: AP.txt
+CGS Variant: E
+Threshold: 0
+Nodes in input graph (G): 18772
+Edges in input graph (G): 198050
+Compressed complement instead of input: False
+Nodes in compressed graph (G_c): 34695
+Edges in compressed graph (G_c): 48128
+Size of original graph (G): 414872
+Size of compressed graph (G_c): 161982
+Compression Ratio: 0.390438
+Compression time (in seconds): 28.5127
+Heap construction time (in seconds): 18.8816
+Iteration time (in seconds): 9.62277
+
+Dataset: AP.txt
+CGS Variant: E
+Threshold: 0
+Nodes in input graph (G): 18772
+Edges in input graph (G): 198050
+Compressed complement instead of input: False
+Nodes in compressed graph (G_c): 34695
+Edges in compressed graph (G_c): 48128
+Size of original graph (G): 414872
+Size of compressed graph (G_c): 161982
+Compression Ratio: 0.390438
+Compression time (in seconds): 28.9318
+Heap construction time (in seconds): 19.4523
+Iteration time (in seconds): 9.47136
+
+Dataset: AP.txt
+CGS Variant: E
+Threshold: 0
+Nodes in input graph (G): 18772
+Edges in input graph (G): 198050
+Compressed complement instead of input: False
+Nodes in compressed graph (G_c): 34695
+Edges in compressed graph (G_c): 48128
+Size of original graph (G): 414872
+Size of compressed graph (G_c): 161982
+Compression Ratio: 0.390438
+Compression time (in seconds): 28.8528
+Heap construction time (in seconds): 19.2148
+Iteration time (in seconds): 9.63027
+
