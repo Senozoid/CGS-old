@@ -1,4 +1,6 @@
+//NOTE: minimum version C++20 required (use "g++ -std=c++20 ...")
 #include<bits/stdc++.h>
+#include<span>
 using namespace std;
 
 #define vvi vector< vector<int> >
@@ -16,7 +18,7 @@ vi remove(vi vec, int i, int j) {
 }
 
 
-class SetOp{
+class SetOp{ //TODO: replace intersection and union functions
 	private:
 		inline thread_local static vector<int> ADJ;
 		inline thread_local static int TKN = 0;
@@ -44,7 +46,7 @@ class SetOp{
 };
 
 
-int SetOp::part(const int n, vi& I, vi& J){ //TODO: replace intersection and union functions
+int SetOp::part(const int n, vi& I, vi& J){
 	//returns the number of common elements, and puts exclusive elements early in each vi
 	
 	bool ord = I.size() > J.size();
@@ -142,49 +144,6 @@ vi SetOp::union_copy(const int n, const vi& I, const vi& J){
 	return union_v;
 }
 
-
-vvi intersection(int n, vi I, vi J) { //TODO: replace and deprecate
-  vector< bool > v(n, 0);
-  vi inter;
-  vi ninter_i, ninter_j;
-
-  REP(k, I.size()) v[I[k]] = 1;
-
-  REP(k, J.size()) {
-      int node = J[k];
-      if(v[node]) inter.push_back(node);
-      else ninter_j.push_back(node);
-      v[node] = 0;
-  }
-
-  REP(k, I.size()) if(v[I[k]]) ninter_i.push_back(I[k]);
-
-  vvi result;
-  result.assign(3, vi ());
-  result[0] = inter;
-  result[1] = ninter_i;
-  result[2] = ninter_j;
-
-  return result;
-}
-vi Union(int n, vi I, vi J) { //TODO: replace and deprecate
-  vector< bool > v(n, 0);
-  vi result;
-
-  REP(k, I.size()) {
-    int node = I[k];
-    if(node > n) cout << "Exception triggered at Union" << endl;
-    v[node] = 1;
-    result.push_back(node);
-  }
-  REP(k, J.size()) {
-    int node = J[k];
-    if(node > n) cout << "Exception triggered at Union" << endl;
-    if(!v[node]) result.push_back(node);
-  }
-
-  return result;
-}
 class Heap {
   private:
   public:
@@ -598,47 +557,44 @@ void CommonHood::build_heap() {
   }
 }
 int CommonHood::cg(int i, int j) { //probably the most frequently called function
-  vvi sets = intersection(G_.n_, G_.adj[i], G_.adj[j]);
-  vi inter = sets[0];
-  vi ninter_i = sets[1];
-  vi ninter_j = sets[2];
+	int nic = SetOp::inter_count(G_.n_, G_.adj[i], G_.adj[j]);
+	int ex_i = G_.adj[i].size() - nic;
+	int ex_j = G_.adj[j].size() - nic;
+	
+	
+	bool ij_edge = ex_i > ex_j ?
+		find(G_.adj[j].begin(), G_.adj[j].end(), i) != G_.adj[j].end() :
+		find(G_.adj[i].begin(), G_.adj[i].end(), j) != G_.adj[i].end() ;
 
-  bool ij_edge = false;
-  REP(k, ninter_i.size()) if(ninter_i[k] == j) ij_edge = true; 
-  REP(k, ninter_j.size()) if(ninter_j[k] == i) ij_edge = true; 
+	int gain;
 
-  int gain = 0;
+	if(fp == -1){
+		gain = 2 * (nic + ex_i + ex_j) - 3;
+		if(ij_edge) gain -= 2;
+	}
+	else gain = 2 * nic - 3; //if(fp==0||fp==1)
 
-  if(fp == 0)
-    gain = 2 * inter.size() - 3;
+	if(i < G_.n) {
+		if(fp == -1) gain++;
+		else if(fp == 1 && !ij_edge) gain++;
+		else if(fp == 0 && ex_i == 0) gain++;
+	}
 
-  else if(fp == -1) {
-    gain = 2 * (inter.size() + ninter_i.size() + ninter_j.size()) - 3;
-    if(ij_edge) gain -= 2;
-  }
-  
-  else if(fp == 1) 
-    gain = 2 * inter.size() - 3;
+	if(j < G_.n) {
+		if(fp == -1) gain++;
+		else if(fp == 1 && !ij_edge) gain++;
+		else if(fp == 0 && ex_j == 0) gain++;
+	}
 
-  if(i < G_.n) {
-    if(fp == -1) gain++;
-    else if(fp == 1 && !ij_edge) gain++;
-    else if(fp == 0 && ninter_i.size() == 0) gain++;
-  }
-
-  if(j < G_.n) {
-    if(fp == -1) gain++;
-    else if(fp == 1 && !ij_edge) gain++;
-    else if(fp == 0 && ninter_j.size() == 0) gain++;
-  }
-
-  return gain;
+	return gain;
 }
 bool CommonHood::is_safe_merge(int i, int j) {
-  vvi results = intersection(G_.n_, G_.adj[i], G_.adj[j]);
-  vi inter = results[0];
-  vi ninter_i = results[1];
-  vi ninter_j = results[2];
+	int nic = SetOp::part(G_.n_, G_.adj[i], G_.adj[j]);
+	int ex_i = G_.adj[i].size() - nic;
+  
+	span<int> ninter_i(G_.adj[i].data(), ex_i);
+	span<int> inter(G_.adj[i].data() + ex_i, nic);
+	span<int> ninter_j(G_.adj[j].data(), G_.adj[j].size() - nic);
 
   vi nI, nJ;
 
@@ -718,12 +674,14 @@ bool CommonHood::is_safe_merge(int i, int j) {
   return true;
 }
 void CommonHood::merge(int i, int j) {
-  vvi results = intersection(G_.n_, G_.adj[i], G_.adj[j]);
-  vi inter = results[0];
-  vi ninter_i = results[1];
-  vi ninter_j = results[2];
-
-  if(inter.size() == 0) return;
+	int nic = SetOp::part(G_.n_, G_.adj[i], G_.adj[j]);
+	if(!nic) return;
+	int ex_i = G_.adj[i].size() - nic;
+	int ex_j = G_.adj[j].size() - nic;
+  
+	span<int> ninter_i(G_.adj[i].data(), ex_i);
+	span<int> inter(G_.adj[i].data() + ex_i, nic);
+	span<int> ninter_j(G_.adj[j].data(), ex_j);
 
   bool ij_edge = false;
   REP(k, ninter_i.size()) if(ninter_i[k] == j) ij_edge = true; 
@@ -783,9 +741,8 @@ void CommonHood::merge(int i, int j) {
   }
   else if(fp == 0) {
     update_heap(i, j, idx);
-    G_.adj[i].clear(), G_.adj[j].clear();
-    G_.adj[i] = ninter_i;
-    G_.adj[j] = ninter_j;
+    G_.adj[i].resize(ex_i);
+    G_.adj[j].resize(ex_j);
   }
 
   // Making the parent and child mappings
@@ -795,7 +752,7 @@ void CommonHood::merge(int i, int j) {
   // Combine the subnodes
   // Will combine the subodes present in node i and j
   // The vector at any index of cached_sN will not contain any supernodes
-  G_.cached_sN[idx] = Union(G_.n, G_.cached_sN[i], G_.cached_sN[j]);
+  G_.cached_sN[idx] = SetOp::union_copy(G_.n, G_.cached_sN[i], G_.cached_sN[j]);
   if(i < G_.n) G_.cached_sN[idx].push_back(i);
   if(j < G_.n) G_.cached_sN[idx].push_back(j);
 
@@ -817,10 +774,12 @@ void CommonHood::update_heap(int a, int b, int idx) {
     if(gain > 0) heap.push(gain, {idx, hop2[k]});
   }
 
-  vvi results = intersection(G_.n_, G_.adj[a], G_.adj[b]);
-  vi inter = results[0];
-  vi ninter_i = results[1];
-  vi ninter_j = results[2];
+	int nic = SetOp::part(G_.n_, G_.adj[a], G_.adj[b]);
+	int ex_i = G_.adj[a].size() - nic;
+  
+	span<int> ninter_i(G_.adj[a].data(), ex_i);
+	span<int> inter(G_.adj[a].data() + ex_i, nic);
+	span<int> ninter_j(G_.adj[b].data(), G_.adj[b].size() - nic);
 
   if(fp == 0) {
 
@@ -942,10 +901,12 @@ void CommonHood::update_heap(int a, int b, int idx) {
   }
 }
 void CommonHood::update_degree(int i, int j) {
-  vvi results = intersection(G_.n_, G_.adj[i], G_.adj[j]);
-  vi inter = results[0];
-  vi ninter_i = results[1];
-  vi ninter_j = results[2];
+	int nic = SetOp::part(G_.n_, G_.adj[i], G_.adj[j]);
+	int ex_i = G_.adj[i].size() - nic;
+  
+	span<int> ninter_i(G_.adj[i].data(), ex_i);
+	span<int> inter(G_.adj[i].data() + ex_i, nic);
+	span<int> ninter_j(G_.adj[j].data(), G_.adj[j].size() - nic);
 
   vi nI, nJ;
   REP(k, ninter_i.size()) {
