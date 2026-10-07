@@ -2,11 +2,11 @@
 
 ### Current works in progress
 
-I am keeping a record of ongoing works because portions of it may otherwise be lost due to deletion of temporary test branches. Only the most immediate and relevant ones are briefly explained here; and if this still becomes long or complicated enough, I will move it into a different file.
+I am keeping a record of ongoing works because portions of it may otherwise be lost due to deletion of temporary test branches. Only the most relevant unnamed patch branches are briefly explained here; and if this still becomes long or complicated enough, I will move it into a different file. For other branches, please check commit history.
 
-+ Patch-1: When input graph is dense, complement is summarized instead; but this was not recorded in summary files, and the query-processing code did not check for it. 
-+ Patch-3: Fixes the same bug as Patch-1, but it simply disables the code which creates the complement of the input graph. Thus all graphs, dense or sparse, are compressed similarly.
-+ Patch-4: The RQ and SP codes expected to generate a fixed minimum number of unique node pairs to test, which resulted in an infinite loop for small graphs.
++ Patches 1, 3: When input graph was dense, complement was summarized instead; but this was not recorded in summary files, and the query-processing code did not check for it. Patch 1 fixes assuming original intent. Patch 3 disables complementing, compressing sparse and dense graphs similarly.
++ Patch 4: The RQ and SP codes expected to generate a fixed minimum number of unique node pairs to test, which resulted in an infinite loop for small graphs. This patch is not finished, but it is functional now.
++ Patch 5: There was a call to the Heap::print_all function in a section of code which was measuring runtime. This was missed (probably) because instead of printing anything, the function just copied output to a temporary variable which was soon destroyed.
 
 ### About issues on this fork
 
