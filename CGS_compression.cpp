@@ -15,7 +15,7 @@ inline void remove_inplace(vi& vec, int i, int j) { //replaces remove(vi,int,int
 }
 
 
-class SetOp{ //TODO: replace intersection and union functions
+class SetOp{ //replaces intersection and union functions
 	private:
 		inline thread_local static vector<int> ADJ;
 		inline thread_local static int TKN = 0;
@@ -36,6 +36,7 @@ class SetOp{ //TODO: replace intersection and union functions
 	
 	public:
 		static int part(const int n, vi& I, vi& J);
+		static pair<int,bool> inter_spec(const CompressedGraph& G, int i, int j);
 		static int inter_count(const int n, const vi& I, const vi& J);
 		static int union_count(const int n, const vi& I, const vi& J);
 		static vi inter_copy(const int n, const vi& I, const vi& J);
@@ -74,6 +75,27 @@ int SetOp::part(const int n, vi& I, vi& J){
 	}
 	
 	return count;
+}
+
+pair<int, bool> SetOp::inter_spec(const CompressedGraph& G, int i, int j){
+	//special function to call from the CommonHood::cg function
+	
+	if(G.adj[i].size() > G.adj[j].size()) std::swap(i,j);
+	if(G.adj[i].empty()) return {0, false};
+	
+	update(G.n_);
+	bool ij_edge = false;
+	for(int node : G.adj[i]){
+		ADJ[node] = TKN;
+		if(node == j) ij_edge = true;
+	}
+	
+	int count = 0;
+	for(int node : G.adj[j]){
+		if(ADJ[node] == TKN) count++;
+	}
+	
+	return {count, ij_edge};
 }
 
 int SetOp::inter_count(const int n, const vi& I, const vi& J){
@@ -462,6 +484,8 @@ int CompressedGraph::size() {
 //---------------------------- CommonHood -------------------------------
 //-----------------------------------------------------------------------
 
+//TODO: many loops in this class can be replaced with range operations, or otherwise improved
+
 class CommonHood {
   private:
     Heap heap;
@@ -535,7 +559,7 @@ void CommonHood::greedy_cn() {
     if(gain <= 0) break;
     bool flag = G_.exists[i] && G_.exists[j] && is_safe_merge(i, j);
     if(flag) {
-      if(fp == -1) update_degree(i, j);
+      if(fp == -1) update_degree(i, j); //TODO: why not called inside merge?
       merge(i, j);   
     } 
   }
@@ -554,15 +578,10 @@ void CommonHood::build_heap() {
   }
 }
 int CommonHood::cg(int i, int j) { //probably the most frequently called function
-	int nic = SetOp::inter_count(G_.n_, G_.adj[i], G_.adj[j]);
+	auto [nic, ij_edge] = SetOp::inter_spec(G_, i, j);
 	int ex_i = G_.adj[i].size() - nic;
 	int ex_j = G_.adj[j].size() - nic;
 	
-	
-	bool ij_edge = ex_i > ex_j ?
-		find(G_.adj[j].begin(), G_.adj[j].end(), i) != G_.adj[j].end() :
-		find(G_.adj[i].begin(), G_.adj[i].end(), j) != G_.adj[i].end() ;
-
 	int gain;
 
 	if(fp == -1){
@@ -585,7 +604,7 @@ int CommonHood::cg(int i, int j) { //probably the most frequently called functio
 
 	return gain;
 }
-bool CommonHood::is_safe_merge(int i, int j) {
+bool CommonHood::is_safe_merge(int i, int j) { //TODO: does not require span
 	int nic = SetOp::part(G_.n_, G_.adj[i], G_.adj[j]);
 	int ex_i = G_.adj[i].size() - nic;
   
@@ -670,7 +689,7 @@ bool CommonHood::is_safe_merge(int i, int j) {
   }
   return true;
 }
-void CommonHood::merge(int i, int j) {
+void CommonHood::merge(int i, int j) { //TODO: can be massively improved
 	int nic = SetOp::part(G_.n_, G_.adj[i], G_.adj[j]);
 	if(!nic) return;
 	int ex_i = G_.adj[i].size() - nic;
@@ -680,9 +699,10 @@ void CommonHood::merge(int i, int j) {
 	span<int> inter(G_.adj[i].data() + ex_i, nic);
 	span<int> ninter_j(G_.adj[j].data(), ex_j);
 
-  bool ij_edge = false;
-  REP(k, ninter_i.size()) if(ninter_i[k] == j) ij_edge = true; 
-  REP(k, ninter_j.size()) if(ninter_j[k] == i) ij_edge = true; 
+	//not using span here because span usage will be replaced soon (for compatibility):
+	bool ij_edge = ex_i > ex_j ?
+		find(G_.adj[j].begin(), G_.adj[j].end()-nic, i) != G_.adj[j].end()-nic :
+		find(G_.adj[i].begin(), G_.adj[i].end()-nic, j) != G_.adj[i].end()-nic ;
 
   int idx = G_.adj.size();
   G_.adj.push_back(vi ());
@@ -691,6 +711,7 @@ void CommonHood::merge(int i, int j) {
   G_.exists.push_back(true);
   G_.n_++;
 
+	
   // Adding neighbourhood of s.
   if(fp == 0 || fp == -1) REP(k, inter.size()) G_.adj[idx].push_back(inter[k]);
   else if(fp == 1) {
@@ -731,7 +752,7 @@ void CommonHood::merge(int i, int j) {
   // Updating: neighbourhoods of i and j; heap; degrees
   if(fp == -1 || fp == 1) {
     update_heap(i, j, idx);
-    if(fp == 1) update_degree(i, j);
+    if(fp == 1) update_degree(i, j); //TODO: why not for fp==-1?
     G_.adj[i].clear(), G_.exists[i] = false;
     G_.adj[j].clear(), G_.exists[j] = false;
     if(fp == 1 && ij_edge) G_.adj[i].push_back(j), G_.adj[j].push_back(i);
@@ -764,7 +785,7 @@ void CommonHood::merge(int i, int j) {
     if(ij_edge) G_.m +=1;
   }
 }
-void CommonHood::update_heap(int a, int b, int idx) {
+void CommonHood::update_heap(int a, int b, int idx) { //TODO: can be improved
   vi hop2 = G_.N2(idx);
   REP(k, hop2.size()) {
     int gain = cg(idx, hop2[k]);
@@ -897,7 +918,7 @@ void CommonHood::update_heap(int a, int b, int idx) {
     }
   }
 }
-void CommonHood::update_degree(int i, int j) {
+void CommonHood::update_degree(int i, int j) { //TODO: can be improved
 	int nic = SetOp::part(G_.n_, G_.adj[i], G_.adj[j]);
 	int ex_i = G_.adj[i].size() - nic;
   
